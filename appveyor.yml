@@ -1,5 +1,6 @@
 environment:
   stack_root: 'C:\stack'
+  tmp: 'C:\tmp'
 
 cache:
   - '%LocalAppData%\Programs\stack -> stack.yaml'
