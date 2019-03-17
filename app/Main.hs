@@ -12,13 +12,16 @@ main :: IO ()
 main = do
   (options, ()) <- simpleOptions
     $(simpleVersion Paths_dhash.version)
-    "Header for command line arguments"
-    "Program description, also for command line arguments"
+    "dhash - directory hash"
+    "take hashes of directory contents"
     (Options
        <$> switch ( long "verbose"
                  <> short 'v'
                  <> help "Verbose output?"
                   )
+       <*> some (strArgument ( help "Input files"
+                            <> metavar "FILE..."
+                             ))
     )
     empty
   lo <- logOptionsHandle stderr (optionsVerbose options)
