@@ -11,6 +11,7 @@ data Options = Options
   , optionsHashAlgorithm :: !HashAlgorithm
   , optionsFiles :: [FilePath]
   , optionsRecursive :: !Bool
+  , optionsDSN :: Maybe String
   }
 
 class HasOptions a where

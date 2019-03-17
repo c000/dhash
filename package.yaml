@@ -38,6 +38,7 @@ library:
   source-dirs: src
   dependencies:
   - mtl
+  - sqlite-simple
 
 executables:
   dhash-exe:

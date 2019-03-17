@@ -37,8 +37,13 @@ main = do
                              ))
        <*> switch ( long "recursive"
                  <> short 'r'
-                 <> help "traverse directory recursively"
+                 <> help "Traverse directory recursively"
                   )
+       <*> option (Just <$> str) ( long "connection-string"
+                                <> value Nothing
+                                <> help "Database connection string"
+                                <> metavar "DSN"
+                                 )
     )
     empty
   lo <- logOptionsHandle stderr (optionsVerbose options)
