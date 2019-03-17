@@ -10,6 +10,7 @@ data Options = Options
   { optionsVerbose :: !Bool
   , optionsHashAlgorithm :: !HashAlgorithm
   , optionsFiles :: [FilePath]
+  , optionsRecursive :: !Bool
   }
 
 class HasOptions a where

@@ -35,6 +35,10 @@ main = do
        <*> some (strArgument ( help "Input files"
                             <> metavar "FILE..."
                              ))
+       <*> switch ( long "recursive"
+                 <> short 'r'
+                 <> help "traverse directory recursively"
+                  )
     )
     empty
   lo <- logOptionsHandle stderr (optionsVerbose options)

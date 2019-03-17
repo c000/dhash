@@ -22,15 +22,21 @@ type Callback m = ResultType -> m ()
 
 walkAndHashFiles :: (MonadUnliftIO m, HasOptions a, HasLogFunc a, MonadReader a m) => [FilePath] -> Callback m -> m Integer
 walkAndHashFiles files callback = do
+  rec <- optionsRecursive . getOptions <$> ask
   childrenSize <- forM files $ \f -> do
     checked <- (,) <$> doesFileExist f <*> doesDirectoryExist f
     case checked of
       (True, False) -> hashSingle f callback
       (False, True) -> do
-        children <- map (f </>) <$> listDirectory f
-        size <- walkAndHashFiles children callback
-        callback $ Directory f size
-        return size
+        case rec of
+          False -> do
+            logWarn $ displayShow f <> " is directory but recursive traverse are disabled"
+            return 0
+          True -> do
+            children <- map (f </>) <$> listDirectory f
+            size <- walkAndHashFiles children callback
+            callback $ Directory f size
+            return size
       _             -> do
         logError $ displayShow f <> " is not a file or directory"
         return 0
