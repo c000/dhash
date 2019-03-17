@@ -37,7 +37,7 @@ ghc-options:
 library:
   source-dirs: src
   dependencies:
-  - template-haskell
+  - mtl
 
 executables:
   dhash-exe:
