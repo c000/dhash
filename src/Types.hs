@@ -3,10 +3,12 @@ module Types where
 
 import RIO
 import RIO.Process
+import Hash.Algorithms
 
 -- | Command line arguments
 data Options = Options
   { optionsVerbose :: !Bool
+  , optionsHashAlgorithm :: !HashAlgorithm
   , optionsFiles :: [FilePath]
   }
 

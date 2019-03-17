@@ -8,6 +8,9 @@ import RIO.Process
 import Options.Applicative.Simple
 import qualified Paths_dhash
 
+import Data.List (foldl1')
+import Hash.Algorithms
+
 main :: IO ()
 main = do
   (options, ()) <- simpleOptions
@@ -19,6 +22,16 @@ main = do
                  <> short 'v'
                  <> help "Verbose output?"
                   )
+       <*> option auto ( long "hash"
+                      <> short 'h'
+                      <> value SHA512
+                      <> showDefault
+                      <> metavar ( (\x -> "(" <> x <> ")")
+                                 . foldl1' (\x y -> x <> "|" <> y)
+                                 . map show
+                                 $ availableHashAlgorithms)
+                      <> help "Hash algorithm"
+                       )
        <*> some (strArgument ( help "Input files"
                             <> metavar "FILE..."
                              ))
