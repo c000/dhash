@@ -12,6 +12,7 @@ data Options = Options
   , optionsFiles :: [FilePath]
   , optionsRecursive :: !Bool
   , optionsDSN :: Maybe String
+  , optionsTableName :: !String
   }
 
 class HasOptions a where

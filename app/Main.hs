@@ -40,10 +40,17 @@ main = do
                  <> help "Traverse directory recursively"
                   )
        <*> option (Just <$> str) ( long "connection-string"
+                                <> short 'c'
                                 <> value Nothing
                                 <> help "Database connection string"
                                 <> metavar "DSN"
                                  )
+       <*> strOption ( long "table-name"
+                    <> value "files"
+                    <> help "Database table name"
+                    <> metavar "NAME"
+                    <> hidden
+                     )
     )
     empty
   lo <- logOptionsHandle stderr (optionsVerbose options)

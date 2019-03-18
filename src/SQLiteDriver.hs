@@ -8,11 +8,12 @@ import Database.SQLite.Simple
 
 import FileWalker
 
-withSQLite :: MonadUnliftIO m => String -> (Connection -> m ()) -> m ()
+withSQLite :: (MonadUnliftIO m, HasOptions a, MonadReader a m) => String -> (Connection -> m ()) -> m ()
 withSQLite connectionString f = do
+  tableName <- optionsTableName . getOptions <$> ask
   bracket (liftIO $ open connectionString) (liftIO . close) $ \conn -> do
     liftIO $ execute_ conn "PRAGMA journal_mode = MEMORY"
-    liftIO $ execute_ conn "CREATE TABLE IF NOT EXISTS files (type, path, hash, size)"
+    liftIO $ execute_ conn $ "CREATE TABLE IF NOT EXISTS " <> fromString tableName <> " (type, path, hash, size)"
     mask $ \restore -> do
       begin conn
       r <- restore (f conn) `onException` rollback conn
@@ -23,10 +24,11 @@ withSQLite connectionString f = do
     commit c   = liftIO $ execute_ c "COMMIT"
     rollback c = liftIO $ execute_ c "ROLLBACK"
 
-insertResult :: MonadUnliftIO m => Connection -> ResultType -> m ()
-insertResult conn r = liftIO $ do
-  case r of
-    File      p h s -> execute conn "insert into files (type, path, hash, size) values (?, ?, ?, ?)"
-                                    ("file"::Text, p, h, s)
-    Directory p   s -> execute conn "insert into files (type, path, hash, size) values (?, ?, ?, ?)"
-                                    ("directory"::Text, p, ""::Text, s)
+insertResult :: (MonadUnliftIO m, HasOptions a, MonadReader a m)=> Connection -> ResultType -> m ()
+insertResult conn r = do
+  tableName <- optionsTableName . getOptions <$> ask
+  liftIO $ execute conn ("insert into " <> fromString tableName <> " (type, path, hash, size) values (?, ?, ?, ?)") values
+  where
+    values = case r of
+      File      p h s -> ("file"::Text, p, h , s)
+      Directory p   s -> ("directory" , p, "", s)
