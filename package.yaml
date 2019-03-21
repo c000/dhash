@@ -44,7 +44,7 @@ library:
   - sqlite-simple
 
 executables:
-  dhash-exe:
+  dhash:
     main:                Main.hs
     source-dirs:         app
     dependencies:
