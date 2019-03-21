@@ -18,6 +18,7 @@ data Options = Options
   , optionsDSN :: Maybe String
   , optionsTableName :: !String
   , optionsTemplate :: !Text
+  , optionsNoNewline :: !Bool
   }
 
 class HasOptions a where

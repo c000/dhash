@@ -61,6 +61,10 @@ main = do
                     <> metavar "TEMPLATE"
                     <> hidden
                      )
+       <*> switch ( short 'n'
+                 <> help "Do not output the trailing newline"
+                 <> hidden
+                  )
     )
     empty
   lo <- logOptionsHandle stderr (optionsVerbose options)
