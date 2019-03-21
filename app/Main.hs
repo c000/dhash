@@ -44,13 +44,14 @@ main = do
        <*> option (Just <$> str) ( long "connection-string"
                                 <> short 'c'
                                 <> value Nothing
-                                <> help "Database connection string"
+                                <> help "SQLite database connection string"
                                 <> metavar "DSN"
+                                <> hidden
                                  )
        <*> strOption ( long "table-name"
                     <> value "files"
                     <> showDefault
-                    <> help "Database table name"
+                    <> help "SQLite database table name"
                     <> metavar "NAME"
                     <> hidden
                      )
