@@ -1,9 +1,13 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE TemplateHaskell #-}
 module Types where
 
 import RIO
 import RIO.Process
+import Prelude (tail)
+
 import Hash.Algorithms
+import qualified Data.Aeson.TH as A
 
 -- | Command line arguments
 data Options = Options
@@ -13,6 +17,7 @@ data Options = Options
   , optionsRecursive :: !Bool
   , optionsDSN :: Maybe String
   , optionsTableName :: !String
+  , optionsTemplate :: !Text
   }
 
 class HasOptions a where
@@ -35,3 +40,29 @@ instance HasLogFunc App where
   logFuncL = lens appLogFunc (\x y -> x { appLogFunc = y })
 instance HasProcessContext App where
   processContextL = lens appProcessContext (\x y -> x { appProcessContext = y })
+
+type Size = Integer
+type HashValue = String
+
+data ResultType
+  = File
+    { _path :: FilePath
+    , _hash :: HashValue
+    , _size :: Size
+    }
+  | Directory
+    { _path :: FilePath
+    , _size :: Size
+    }
+  deriving (Eq, Show)
+
+A.deriveJSON
+  ( A.defaultOptions
+    { A.fieldLabelModifier = tail
+    , A.sumEncoding = A.TaggedObject
+      { A.tagFieldName = "type"
+      , A.contentsFieldName = undefined
+      }
+    }
+  )
+  ''ResultType

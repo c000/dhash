@@ -1,4 +1,6 @@
+{-# OPTIONS_GHC -fno-warn-type-defaults #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 module Main (main) where
 
@@ -47,8 +49,16 @@ main = do
                                  )
        <*> strOption ( long "table-name"
                     <> value "files"
+                    <> showDefault
                     <> help "Database table name"
                     <> metavar "NAME"
+                    <> hidden
+                     )
+       <*> strOption ( long "template"
+                    <> value "{{{type}}}\t{{{path}}}\t{{{hash}}}\t{{{size}}}"
+                    <> showDefault
+                    <> help "Mustache template for console output"
+                    <> metavar "TEMPLATE"
                     <> hidden
                      )
     )

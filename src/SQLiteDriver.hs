@@ -6,8 +6,6 @@ import Import
 
 import Database.SQLite.Simple
 
-import FileWalker
-
 withSQLite :: (MonadUnliftIO m, HasOptions a, MonadReader a m) => String -> (Connection -> m ()) -> m ()
 withSQLite connectionString f = do
   tableName <- optionsTableName . getOptions <$> ask

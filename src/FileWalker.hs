@@ -10,14 +10,6 @@ import System.IO.Error
 
 import Hash
 
-type Size = Integer
-type HashValue = String
-
-data ResultType
-  = File FilePath HashValue Size
-  | Directory FilePath Size
-  deriving (Eq, Show)
-
 type Callback m = ResultType -> m ()
 
 walkAndHashFiles :: (MonadUnliftIO m, HasOptions a, HasLogFunc a, MonadReader a m) => [FilePath] -> Callback m -> m Integer

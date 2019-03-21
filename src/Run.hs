@@ -6,6 +6,7 @@ import Import
 
 import FileWalker
 import SQLiteDriver
+import ConsoleDriver
 
 run :: RIO App ()
 run = do
@@ -14,7 +15,7 @@ run = do
   case dsn of
     Nothing -> do
       _ <- walkAndHashFiles files $ \hash -> do
-        logInfo . displayShow $ hash
+        printResult hash
       return ()
     Just s -> do
       withSQLite s $ \c -> do
