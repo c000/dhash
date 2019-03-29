@@ -16,7 +16,6 @@ data Options = Options
   , optionsFiles :: [FilePath]
   , optionsRecursive :: !Bool
   , optionsDSN :: Maybe String
-  , optionsTableName :: !String
   , optionsTemplate :: !Text
   , optionsNoNewline :: !Bool
   }
