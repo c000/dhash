@@ -1,6 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
-module ConsoleDriver where
+module Drivers.Console where
 
 import Import
 

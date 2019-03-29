@@ -1,6 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
-module SQLiteDriver where
+module Drivers.SQLite where
 
 import Import
 

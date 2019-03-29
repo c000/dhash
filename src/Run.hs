@@ -5,8 +5,8 @@ module Run (run) where
 import Import
 
 import FileWalker
-import SQLiteDriver
-import ConsoleDriver
+import Drivers.SQLite
+import Drivers.Console
 
 run :: RIO App ()
 run = do
