@@ -8,12 +8,20 @@
 module Drivers.SQLite.Model where
 
 import Import
+import RIO.Time
 
 import Database.Groundhog.TH
 import Database.Groundhog.Sqlite
 
+data ExecuteProperty = ExecuteProperty
+  { basePath :: !String
+  , time :: !UTCTime
+  }
+deriving instance Show ExecuteProperty
+
 data Path = Path
-  { path :: !String
+  { executePropertyId :: AutoKey ExecuteProperty
+  , path :: !String
   , size :: !Int64
   , pathType :: !Text
   , hashId :: Maybe (AutoKey Hash)
@@ -35,12 +43,18 @@ mkPersist (defaultCodegenConfig
   }) [groundhog|
 definitions:
 
+- entity: ExecuteProperty
+
 - entity: Path
   constructors:
   - name: Path
     fields:
     - name: pathType
       dbName: type
+    - name: executePropertyId
+      reference:
+        onDelete: set null
+        onUpdate: restrict
     - name: hashId
       reference:
         onDelete: set null

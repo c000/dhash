@@ -7,6 +7,8 @@ module Drivers.SQLite
   ) where
 
 import Import
+import RIO.Directory
+import RIO.Time
 import Control.Monad.Trans.Control
 
 import qualified Database.SQLite3 as S
@@ -15,32 +17,40 @@ import Database.Groundhog.Sqlite hiding (runDbConn)
 
 import qualified Drivers.SQLite.Model as M
 
-withSQLite :: (MonadBaseControl IO m, MonadUnliftIO m) => Text -> (Sqlite -> m ()) -> m ()
+data DriverContext = DC Sqlite (AutoKey M.ExecuteProperty)
+
+withSQLite :: (MonadBaseControl IO m, MonadUnliftIO m) => Text -> (DriverContext -> m ()) -> m ()
 withSQLite connectionString f = do
+  cwd <- getCurrentDirectory
+  t <- getCurrentTime
   bracket (openDB connectionString) closeDB $ \conn -> do
     mask $ \restore -> do
       begin conn
       flip runDbConn' conn $ runMigration $ do
+        migrate (undefined :: M.ExecuteProperty)
         migrate (undefined :: M.Path)
         migrate (undefined :: M.Hash)
-      restore (f conn) `onException` rollback conn
+      restore (do
+        ep <- runDbConn' (insert $ M.ExecuteProperty cwd t) conn
+        f $ DC conn ep
+        ) `onException` rollback conn
       commit conn
   where
     begin c    = execDB c "BEGIN"
     commit c   = execDB c "COMMIT"
     rollback c = execDB c "ROLLBACK"
 
-insertResult :: (MonadBaseControl IO m, MonadUnliftIO m, HasLogFunc a, HasOptions a, MonadReader a m) => Sqlite -> ResultType -> m ()
-insertResult conn r = do
+insertResult :: (MonadBaseControl IO m, MonadUnliftIO m, HasLogFunc a, HasOptions a, MonadReader a m) => DriverContext -> ResultType -> m ()
+insertResult (DC conn ep) r = do
   algo <- optionsHashAlgorithm . getOptions <$> ask
   case r of
     Directory p   s -> do
-      let v = M.Path p (fromIntegral s) "dir" Nothing
+      let v = M.Path ep p (fromIntegral s) "dir" Nothing
       logDebug $ "insert " <> displayShow v
       insert_' v
     File      p h s -> do
       i <- upsert' $ M.Hash h (tshow algo)
-      insert_' $ M.Path p (fromIntegral s) "file" (Just i)
+      insert_' $ M.Path ep p (fromIntegral s) "file" (Just i)
   where
     insert_' v = do
       logDebug $ "insert " <> displayShow v
