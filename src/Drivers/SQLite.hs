@@ -22,7 +22,7 @@ data DriverContext = DC Sqlite (AutoKey M.ExecuteProperty)
 withSQLite :: (MonadBaseControl IO m, MonadUnliftIO m) => Text -> (DriverContext -> m ()) -> m ()
 withSQLite connectionString f = do
   cwd <- getCurrentDirectory
-  t <- getCurrentTime
+  t <- getZonedTime
   bracket (openDB connectionString) closeDB $ \conn -> do
     mask $ \restore -> do
       begin conn
@@ -31,7 +31,7 @@ withSQLite connectionString f = do
         migrate (undefined :: M.Path)
         migrate (undefined :: M.Hash)
       restore (do
-        ep <- runDbConn' (insert $ M.ExecuteProperty cwd t) conn
+        ep <- runDbConn' (insert $ M.ExecuteProperty cwd (M.ZTR t)) conn
         f $ DC conn ep
         ) `onException` rollback conn
       commit conn

@@ -9,13 +9,31 @@ module Drivers.SQLite.Model where
 
 import Import
 import RIO.Time
+import Data.Maybe (fromJust)
 
+import qualified Data.Aeson as A
+import Database.Groundhog.Core
+import Database.Groundhog.Generic
 import Database.Groundhog.TH
-import Database.Groundhog.Sqlite
+import Database.Groundhog.Sqlite ()
+
+newtype ZonedTimeRFC3339 = ZTR ZonedTime
+  deriving Show
+
+instance PersistField ZonedTimeRFC3339 where
+  persistName _ = "ZonedTimeRFC3339"
+  toPersistValues = primToPersistValue
+  fromPersistValues = primFromPersistValue
+  dbType _ _ = DbTypePrimitive DbString False Nothing Nothing
+
+instance PrimitivePersistField ZonedTimeRFC3339 where
+  toPrimitivePersistValue (ZTR t) = PersistText . either (error "ZonedTime encode error") id . decodeUtf8' . toStrictBytes $ A.encode t
+  fromPrimitivePersistValue (PersistText t) = ZTR . fromJust . A.decode . fromStrictBytes . encodeUtf8 $ t
+  fromPrimitivePersistValue _ = error "unexpected type of ZonedTimeRFC3339"
 
 data ExecuteProperty = ExecuteProperty
   { basePath :: !String
-  , time :: !UTCTime
+  , time :: !ZonedTimeRFC3339
   }
 deriving instance Show ExecuteProperty
 

@@ -65,6 +65,10 @@ tests:
     dependencies:
     - dhash
     - hspec
+    - QuickCheck
+    - quickcheck-instances
+    - aeson
+    - groundhog-sqlite
 
     ghc-options:
     - -threaded
