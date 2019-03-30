@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 module Drivers.SQLite
@@ -6,31 +7,64 @@ module Drivers.SQLite
   ) where
 
 import Import
+import Control.Monad.Trans.Control
 
-import Database.SQLite.Simple
+import qualified Database.SQLite3 as S
+import Database.Groundhog.Core (runDbConn')
+import Database.Groundhog.Sqlite hiding (runDbConn)
 
-tableName :: String
-tableName = "files"
+import qualified Drivers.SQLite.Model as M
 
-withSQLite :: MonadUnliftIO m => String -> (Connection -> m ()) -> m ()
+withSQLite :: (MonadBaseControl IO m, MonadUnliftIO m) => Text -> (Sqlite -> m ()) -> m ()
 withSQLite connectionString f = do
-  bracket (liftIO $ open connectionString) (liftIO . close) $ \conn -> do
-    liftIO $ execute_ conn "PRAGMA journal_mode = MEMORY"
-    liftIO $ execute_ conn $ "CREATE TABLE IF NOT EXISTS " <> fromString tableName <> " (type, path, hash, size)"
+  bracket (openDB connectionString) closeDB $ \conn -> do
     mask $ \restore -> do
       begin conn
-      r <- restore (f conn) `onException` rollback conn
+      flip runDbConn' conn $ runMigration $ do
+        migrate (undefined :: M.Path)
+        migrate (undefined :: M.Hash)
+      restore (f conn) `onException` rollback conn
       commit conn
-      return r
   where
-    begin c    = liftIO $ execute_ c "BEGIN TRANSACTION"
-    commit c   = liftIO $ execute_ c "COMMIT"
-    rollback c = liftIO $ execute_ c "ROLLBACK"
+    begin c    = execDB c "BEGIN"
+    commit c   = execDB c "COMMIT"
+    rollback c = execDB c "ROLLBACK"
 
-insertResult :: MonadUnliftIO m => Connection -> ResultType -> m ()
+insertResult :: (MonadBaseControl IO m, MonadUnliftIO m, HasLogFunc a, HasOptions a, MonadReader a m) => Sqlite -> ResultType -> m ()
 insertResult conn r = do
-  liftIO $ execute conn ("insert into " <> fromString tableName <> " (type, path, hash, size) values (?, ?, ?, ?)") values
+  algo <- optionsHashAlgorithm . getOptions <$> ask
+  case r of
+    Directory p   s -> do
+      let v = M.Path p (fromIntegral s) "dir" Nothing
+      logDebug $ "insert " <> displayShow v
+      insert_' v
+    File      p h s -> do
+      i <- upsert' $ M.Hash h (tshow algo)
+      insert_' $ M.Path p (fromIntegral s) "file" (Just i)
   where
-    values = case r of
-      File      p h s -> ("file"::Text, p, h , s)
-      Directory p   s -> ("directory" , p, "", s)
+    insert_' v = do
+      logDebug $ "insert " <> displayShow v
+      runDbConn' (insert_ v) conn
+    upsert' v = do
+      logDebug $ "upsert " <> displayShow v
+      i <- runDbConn' (insertByAll v) conn
+      return $ either id id i
+
+openDB :: MonadIO m => Text -> m Sqlite
+openDB s = Sqlite <$> mconn <*> newIORef mempty
+  where
+    mconn = do
+      conn <- liftIO $ S.open s
+      liftIO $ S.exec conn "PRAGMA foregin_keys = ON"
+      liftIO $ S.exec conn "PRAGMA journal_mode = MEMORY"
+      return conn
+
+closeDB :: MonadIO m => Sqlite -> m ()
+closeDB (Sqlite conn caches) = do
+  cs <- readIORef caches
+  mapM_ (liftIO . S.finalize) $ toList cs
+  liftIO $ S.close conn
+
+execDB :: MonadIO m => Sqlite -> Text -> m ()
+execDB (Sqlite conn _) t = do
+  liftIO $ S.exec conn t

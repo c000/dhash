@@ -21,11 +21,6 @@ description:         Please see the README on Github at <https://github.com/gith
 dependencies:
 - base >= 4.11 && < 10
 - rio >= 0.1.7.0
-- text
-- aeson
-- stache
-- io-streams
-- cryptonite
 
 ghc-options:
 - -Wall
@@ -40,7 +35,16 @@ library:
   source-dirs: src
   dependencies:
   - mtl
-  - sqlite-simple
+  - text
+  - aeson
+  - stache
+  - io-streams
+  - cryptonite
+  - direct-sqlite
+  - monad-control
+  - groundhog
+  - groundhog-th
+  - groundhog-sqlite
 
 executables:
   dhash:
