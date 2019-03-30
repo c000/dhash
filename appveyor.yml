@@ -24,7 +24,9 @@ deploy:
   provider: GitHub
   auth_token:
     secure: w+mU/6hVeIA/syTrgCb8ypIFACJUlPAKlg3Cc0JWlbQEiNJUn9PjLcVklvIJuWp+
-  release: test-$(APPVEYOR_REPO_TAG_NAME)
+  release: $(APPVEYOR_REPO_TAG_NAME)
   description: $(APPVEYOR_REPO_COMMIT_MESSAGE)
   draft: true
   artiface: /.*\.zip/
+  on:
+    APPVEYOR_REPO_TAG: true
