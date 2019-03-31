@@ -15,8 +15,7 @@ data Options = Options
   , optionsHashAlgorithm :: !HashAlgorithm
   , optionsFiles :: [FilePath]
   , optionsRecursive :: !Bool
-  , optionsDSN :: Maybe String
-  , optionsTableName :: !String
+  , optionsDSN :: Maybe Text
   , optionsTemplate :: !Text
   , optionsNoNewline :: !Bool
   }

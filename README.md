@@ -22,7 +22,6 @@ Available options:
   -r,--recursive           Traverse directory recursively
   -c,--connection-string DSN
                            SQLite database connection string
-  --table-name NAME        SQLite database table name (default: "files")
   --template TEMPLATE      Mustache template for console
                            output (default: "{{{type}}}\t{{{path}}}\t{{{hash}}}\t{{{size}}}")
   -n                       Do not output the trailing newline

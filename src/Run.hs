@@ -17,7 +17,7 @@ run = do
       _ <- walkAndHashFiles files $ \hash -> do
         printResult hash
       return ()
-    Just s -> do
+    Just s -> RIO $ do
       withSQLite s $ \c -> do
         _ <- walkAndHashFiles files $ \hash -> do
           insertResult c hash

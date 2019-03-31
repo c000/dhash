@@ -48,13 +48,6 @@ main = do
                                 <> metavar "DSN"
                                 <> hidden
                                  )
-       <*> strOption ( long "table-name"
-                    <> value "files"
-                    <> showDefault
-                    <> help "SQLite database table name"
-                    <> metavar "NAME"
-                    <> hidden
-                     )
        <*> strOption ( long "template"
                     <> value "{{{type}}}\t{{{path}}}\t{{{hash}}}\t{{{size}}}"
                     <> showDefault
