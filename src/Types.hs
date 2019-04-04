@@ -16,7 +16,7 @@ data Options = Options
   , optionsFiles :: [FilePath]
   , optionsRecursive :: !Bool
   , optionsDSN :: Maybe Text
-  , optionsTemplate :: !Text
+  , optionsTemplate :: !LText
   , optionsNoNewline :: !Bool
   }
 

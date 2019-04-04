@@ -37,7 +37,7 @@ library:
   - mtl
   - text
   - aeson
-  - stache
+  - microstache
   - io-streams
   - cryptonite
   - direct-sqlite

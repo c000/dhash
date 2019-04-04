@@ -6,7 +6,7 @@ import Import
 
 import Data.Aeson
 import Data.Text.Lazy.IO
-import Text.Mustache
+import Text.Microstache
 
 printResult :: (MonadUnliftIO m, HasLogFunc a, HasOptions a, MonadReader a m) => ResultType -> m ()
 printResult r = do
