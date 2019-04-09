@@ -2,9 +2,9 @@ name:                dhash
 version:             0.2.1.0
 github:              githubuser/dhash
 license:             BSD3
-author:              Author name here
-maintainer:          example@example.com
-copyright:           2019 Author name here
+author:              c000
+maintainer:          c255xff@gmail.com
+copyright:           2019 c000
 
 extra-source-files:
 - README.md
