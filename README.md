@@ -1,6 +1,7 @@
 # dhash
 
 [![Build status](https://ci.appveyor.com/api/projects/status/mqdnlfphuxcvwc7r/branch/master?svg=true)](https://ci.appveyor.com/project/c000/dhash/branch/master)
+[![wercker status](https://app.wercker.com/status/ca38032abdc879e766172810b656e8ed/s/master "wercker status")](https://app.wercker.com/project/byKey/ca38032abdc879e766172810b656e8ed)
 
 ## Usage
 
