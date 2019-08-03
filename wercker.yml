@@ -1,5 +1,5 @@
 box:
-  id: haskell:8.4.4
+  id: haskell:8.6.5
   env:
     CACHE: $WERCKER_CACHE_DIR/cache.tar.gz
 
