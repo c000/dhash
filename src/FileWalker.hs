@@ -25,10 +25,16 @@ walkAndHashFiles files callback = do
             logWarn $ displayShow f <> " is directory but recursive traverse are disabled"
             return 0
           True -> do
-            children <- map (f </>) <$> listDirectory f
-            size <- walkAndHashFiles children callback
-            callback $ Directory f size
-            return size
+            eitherElems <- tryIO $ listDirectory f
+            case eitherElems of
+              Left err -> do
+                logError . displayShow $ (f, err)
+                return 0
+              Right es -> do
+                let children = map (f </>) es
+                size <- walkAndHashFiles children callback
+                callback $ Directory f size
+                return size
       _             -> do
         logError $ displayShow f <> " is not a file or directory"
         return 0
