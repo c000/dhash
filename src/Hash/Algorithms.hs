@@ -1,7 +1,8 @@
 module Hash.Algorithms
   ( HashAlgorithm(..)
   , availableHashAlgorithms
-  ) where
+  )
+where
 
 data HashAlgorithm
   = SHA512
