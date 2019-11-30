@@ -26,3 +26,7 @@ jobs:
       - name: build
         run:
           stack build
+
+      - name: lint
+        run: |
+          curl -sSL https://raw.github.com/ndmitchell/hlint/master/misc/run.sh | sh -s src

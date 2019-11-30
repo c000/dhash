@@ -7,15 +7,15 @@
 {-# LANGUAGE StandaloneDeriving #-}
 module Drivers.SQLite.Model where
 
-import Import
-import RIO.Time
-import Data.Maybe (fromJust)
+import           Import
+import           RIO.Time
+import           Data.Maybe                     ( fromJust )
 
-import qualified Data.Aeson as A
-import Database.Groundhog.Core
-import Database.Groundhog.Generic
-import Database.Groundhog.TH
-import Database.Groundhog.Sqlite ()
+import qualified Data.Aeson                    as A
+import           Database.Groundhog.Core
+import           Database.Groundhog.Generic
+import           Database.Groundhog.TH
+import           Database.Groundhog.Sqlite      ( )
 
 newtype ZonedTimeRFC3339 = ZTR ZonedTime
   deriving Show
