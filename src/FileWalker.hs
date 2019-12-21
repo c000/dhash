@@ -25,11 +25,6 @@ walkAndHashFiles files callback = do
       (True , False) -> hashSingle f callback
       (False, True ) -> if rec
         then do
-          logWarn
-            $  displayShow f
-            <> " is directory but recursive traverse are disabled"
-          return 0
-        else do
           eitherElems <- tryIO $ listDirectory f
           case eitherElems of
             Left err -> do
@@ -40,6 +35,11 @@ walkAndHashFiles files callback = do
               size <- walkAndHashFiles children callback
               callback $ Directory f size
               return size
+        else do
+          logWarn
+            $  displayShow f
+            <> " is directory but recursive traverse are disabled"
+          return 0
       _ -> do
         logError $ displayShow f <> " is not a file or directory"
         return 0
