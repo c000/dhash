@@ -15,13 +15,7 @@ jobs:
 
       - uses: actions/setup-haskell@v1
         with:
-          ghc-version: '8.8.4'
           enable-stack: true
-
-      - name: stack config
-        run: |
-          mkdir -p ~/.stack/
-          echo 'system-ghc: true' > ~/.stack/config.yaml
 
       - name: build
         run:
