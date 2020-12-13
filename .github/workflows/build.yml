@@ -6,17 +6,17 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
 
-      - uses: actions/cache@v1
+      - uses: actions/cache@v2
         with:
           path: ~/.stack
           key: ${{ hashFiles('stack.yaml') }}
 
       - uses: actions/setup-haskell@v1
         with:
-          ghc-version: '8.6.5'
-          cabal-version: '3.0'
+          ghc-version: '8.8.4'
+          enable-stack: true
 
       - name: stack config
         run: |
