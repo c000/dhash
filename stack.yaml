@@ -68,3 +68,13 @@ extra-deps:
   - groundhog-sqlite-0.11.0
   - groundhog-th-0.11
   - direct-sqlite-2.3.26
+  - constraints-extras-0.3.0.2
+  - dependent-map-0.4.0.0
+  - dependent-sum-0.7.1.0
+  - some-1.0.1
+  - git: https://github.com/haskell-beam/beam
+    commit: 596981a1ea6765b9f311d48a2ec4d8460ebc4b7e
+    subdirs:
+      - beam-core
+      - beam-migrate
+      - beam-sqlite
