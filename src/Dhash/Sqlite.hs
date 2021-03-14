@@ -104,7 +104,10 @@ withSqlite connectionString f = do
       execute_ c "CREATE UNIQUE INDEX IF NOT EXISTS hash_uix on hash (hash, hash_type)"
       return row
 
-    f $ DC c (primaryKey row)
+    liftIO $ execute_ c "BEGIN"
+    (f $ DC c (primaryKey row))
+      `onException` (liftIO $ execute_ c "ROLLBACK")
+    liftIO $ execute_ c "COMMIT"
  where
   executeProperty = dbExecuteProperty dhashDb
   formatTime' = pack . formatTime defaultTimeLocale "%FT%T.%q"
