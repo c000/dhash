@@ -8,7 +8,7 @@ import           Import
 
 import           FileWalker
 import           Drivers.SQLite
-import           Drivers.Console
+import           Dhash.Console
 
 run :: RIO App ()
 run = do
