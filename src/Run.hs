@@ -7,7 +7,7 @@ where
 import           Import
 
 import           FileWalker
-import           Drivers.SQLite
+import           Dhash.Sqlite
 import           Dhash.Console
 
 run :: RIO App ()
@@ -18,7 +18,7 @@ run = do
     Nothing -> do
       _ <- walkAndHashFiles files $ \hash -> printResult hash
       return ()
-    Just s -> RIO $ withSQLite s $ \c -> do
+    Just s -> RIO $ withSqlite s $ \c -> do
       _ <- walkAndHashFiles files $ \hash -> do
         insertResult c hash
         logDebug . displayShow $ hash
