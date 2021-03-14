@@ -15,6 +15,7 @@ import           Control.Monad.Trans.Control
 
 import           Database.SQLite.Simple
 import           Database.Beam
+import           Database.Beam.Backend.SQL
 import           Database.Beam.Migrate.Simple ( autoMigrate
                                               , verifySchema
                                               , VerificationResult(..)
@@ -77,12 +78,13 @@ insertResult (DC conn ep) r = do
     case hashRow of
       Just row -> return $ primaryKey row
       Nothing -> liftIO $ do
-        [row] <- runBeamSqlite conn . runInsertReturningList . insertReturning (dbHash dhashDb) $ insertExpressions
+        runBeamSqlite conn . runInsert . insert (dbHash dhashDb) $ insertExpressions
           [ Hash default_
                  (val_ h)
                  (val_ algo)
           ]
-        return $ primaryKey $ row
+        rowid <- lastInsertRowId conn
+        return $ HashId . SqlSerial $ rowid
 
 withSqlite
   :: (MonadBaseControl IO m, MonadUnliftIO m)
