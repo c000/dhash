@@ -26,9 +26,11 @@ spec = describe "Migration" $ do
         execute_ c "PRAGMA joirnal_mode = MEMORY"
 
         runBeamSqlite c $ autoMigrate migrationBackend checkedDhashDb
-
         execute_ c "CREATE UNIQUE INDEX IF NOT EXISTS hash_uix on hash (hash, hash_type)"
-    ) `shouldReturn` ()
+
+        r <- runBeamSqlite c $ verifySchema migrationBackend checkedDhashDb
+        return (show r)
+    ) `shouldReturn` "VerificationSucceeded"
 
   it "can insert to hash" $
     ( runBeamSqlite c $ do

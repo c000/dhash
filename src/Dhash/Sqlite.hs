@@ -15,7 +15,10 @@ import           Control.Monad.Trans.Control
 
 import           Database.SQLite.Simple
 import           Database.Beam
-import           Database.Beam.Migrate.Simple (autoMigrate)
+import           Database.Beam.Migrate.Simple ( autoMigrate
+                                              , verifySchema
+                                              , VerificationResult(..)
+                                              )
 import           Database.Beam.Sqlite
 import           Database.Beam.Sqlite.Migrate
 
@@ -91,25 +94,34 @@ withSqlite connectionString f = do
   cwd <- getCurrentDirectory
   t   <- getZonedTime
 
-  bracket openDB closeDB $ \c -> do
-    row <- liftIO $ do
-      execute_ c "PRAGMA joirnal_mode = MEMORY"
+  bracket openDB closeDB $ \c ->
+    mask $ \restore -> do
+      liftIO $ do
+        execute_ c "PRAGMA joirnal_mode = MEMORY"
+        migrate c
 
-      [row] <- runBeamSqlite c $ do
-        autoMigrate migrationBackend checkedDhashDb
-        runInsertReturningList $ insertReturning executeProperty $ insertExpressions
-          [ ExecuteProperty default_ (val_ . pack $ cwd) (val_ . formatTime' $ t)
-          ]
+      row <- liftIO $ do
+        execute_ c "BEGIN"
 
-      execute_ c "CREATE UNIQUE INDEX IF NOT EXISTS hash_uix on hash (hash, hash_type)"
-      return row
+        [row] <- runBeamSqlite c $ do
+          runInsertReturningList $ insertReturning executeProperty $ insertExpressions
+            [ ExecuteProperty default_ (val_ . pack $ cwd) (val_ . formatTime' $ t)
+            ]
+        return row
 
-    liftIO $ execute_ c "BEGIN"
-    (f $ DC c (primaryKey row))
-      `onException` (liftIO $ execute_ c "ROLLBACK")
-    liftIO $ execute_ c "COMMIT"
+      restore (f $ DC c (primaryKey row))
+        `onException` (liftIO $ execute_ c "ROLLBACK")
+      liftIO $ execute_ c "COMMIT"
  where
   executeProperty = dbExecuteProperty dhashDb
   formatTime' = pack . formatTime defaultTimeLocale "%FT%T.%q"
   openDB = liftIO . open $ unpack connectionString
   closeDB = liftIO . close
+
+  migrate c = do
+    r <- runBeamSqlite c $ verifySchema migrationBackend checkedDhashDb
+    case r of
+      VerificationSucceeded -> return ()
+      VerificationFailed _ -> do
+        runBeamSqlite c $ autoMigrate migrationBackend checkedDhashDb
+        execute_ c "CREATE UNIQUE INDEX IF NOT EXISTS hash_uix on hash (hash, hash_type)"
