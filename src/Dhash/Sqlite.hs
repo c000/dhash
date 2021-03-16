@@ -112,7 +112,7 @@ withSqlite connectionString f = do
         return row
 
       restore (f $ DC c (primaryKey row))
-        `onException` (liftIO $ execute_ c "ROLLBACK")
+        `onException` liftIO (execute_ c "ROLLBACK")
       liftIO $ execute_ c "COMMIT"
  where
   executeProperty = dbExecuteProperty dhashDb
