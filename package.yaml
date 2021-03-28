@@ -1,5 +1,5 @@
 name:                dhash
-version:             0.2.1.4
+version:             0.3.0.0
 github:              githubuser/dhash
 license:             BSD3
 author:              c000
@@ -49,6 +49,10 @@ library:
   - groundhog
   - groundhog-th
   - groundhog-sqlite
+  - sqlite-simple
+  - beam-core
+  - beam-migrate
+  - beam-sqlite
 
 executables:
   dhash:
@@ -77,6 +81,10 @@ tests:
     - quickcheck-instances
     - aeson
     - groundhog-sqlite
+    - sqlite-simple
+    - beam-core
+    - beam-migrate
+    - beam-sqlite
 
     ghc-options:
     - -threaded

@@ -26,7 +26,7 @@ main = do
                   )
        <*> option auto ( long "hash"
                       <> short 'h'
-                      <> value MD5
+                      <> value SHA512
                       <> showDefault
                       <> metavar ( (\x -> "(" <> x <> ")")
                                  . foldl1' (\x y -> x <> "|" <> y)
