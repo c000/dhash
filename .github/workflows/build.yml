@@ -10,16 +10,23 @@ jobs:
 
       - uses: actions/cache@v2
         with:
-          path: ~/.stack
-          key: ${{ hashFiles('stack.yaml') }}
+          path: |
+            ~/.cabal/packages
+            ~/.cabal/store
+            dist-newstyle
+          key: ${{ runner.os }}
 
-      - uses: actions/setup-haskell@v1
+      - uses: haskell/actions/setup@v1
         with:
-          enable-stack: true
+          ghc-version: "8.8.4"
 
       - name: build
         run:
-          stack build
+          cabal build
+
+      - name: test
+        run:
+          cabal test
 
       - name: lint
         run: |

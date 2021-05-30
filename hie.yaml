@@ -1,0 +1,6 @@
+cradle:
+  cabal:
+    - path: "./src"
+      component: "lib:dhash"
+    - path: "./app"
+      component: "exe:dhash"
