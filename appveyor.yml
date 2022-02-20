@@ -6,7 +6,7 @@ cache:
 
 before_build:
   - choco install -y cabal
-  - choco install -y ghc --version 8.8.4
+  - choco install -y ghc --version 8.10.7
   - refreshenv
 
 build_script:
